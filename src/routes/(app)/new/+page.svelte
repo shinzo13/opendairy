@@ -195,7 +195,7 @@
 
 	/* ── desktop ── */
 	@media (min-width: 768px) {
-		header, form {
+		form {
 			width: 100%;
 			max-width: 560px;
 			margin: 0 auto;

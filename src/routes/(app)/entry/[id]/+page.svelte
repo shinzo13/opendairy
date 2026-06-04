@@ -60,8 +60,6 @@
 	header {
 		position: absolute;
 		top: 0; left: 0; right: 0;
-		max-width: 640px;
-		margin: 0 auto;
 		z-index: 10;
 		display: flex;
 		align-items: center;

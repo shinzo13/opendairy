@@ -283,11 +283,7 @@
 
 	/* ── desktop ── */
 	@media (min-width: 768px) {
-		header {
-			max-width: 720px;
-			margin: 0 auto;
-			padding: 20px 24px;
-		}
+		header { padding: 20px 32px; }
 
 		.logo { font-size: 22px; }
 
