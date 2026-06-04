@@ -8,32 +8,31 @@
 
 	let menuOpen = $state(false);
 
-	// убираем ?welcome из URL сразу, чтобы не показывался при обновлении
 	$effect(() => {
 		if (data.welcome) replaceState('/', {});
 	});
 
 	function formatDate(iso: string) {
 		const d = new Date(iso + 'T00:00:00');
-		return d.toLocaleDateString('ru-RU', { day: 'numeric', month: 'short' });
+		return d.toLocaleDateString('en-US', { day: 'numeric', month: 'short' });
 	}
 </script>
 
 {#if data.welcome}
-	<Toast message="аккаунт создан" />
+	<Toast message="account created" />
 {/if}
 
 <div class="page">
 	<header>
 		<span class="logo">OpenDiary</span>
 		<div class="header-right">
-			<a href="/new" class="add-btn" aria-label="новая запись">
+			<a href="/new" class="add-btn" aria-label="new entry">
 				<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
 					<line x1="12" y1="5" x2="12" y2="19" />
 					<line x1="5" y1="12" x2="19" y2="12" />
 				</svg>
 			</a>
-			<button class="avatar-btn" onclick={() => (menuOpen = true)} aria-label="профиль">
+			<button class="avatar-btn" onclick={() => (menuOpen = true)} aria-label="profile">
 				<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
 					<circle cx="12" cy="8" r="4" />
 					<path d="M4 20c0-4 3.6-7 8-7s8 3 8 7" />
@@ -45,8 +44,8 @@
 	<main>
 		{#if data.entries.length === 0}
 			<div class="empty">
-				<p>пока пусто</p>
-				<a href="/new" class="cta">добавить первую запись</a>
+				<p>nothing here yet</p>
+				<a href="/new" class="cta">add first entry</a>
 			</div>
 		{:else}
 			<div class="timeline">
@@ -102,7 +101,7 @@
 				<polyline points="16 17 21 12 16 7" />
 				<line x1="21" y1="12" x2="9" y2="12" />
 			</svg>
-			выйти
+			sign out
 		</a>
 	</div>
 {/if}

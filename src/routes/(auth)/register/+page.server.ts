@@ -14,11 +14,11 @@ export const actions: Actions = {
 		const email = (data.get('email') as string)?.trim().toLowerCase();
 		const password = data.get('password') as string;
 
-		if (!email || !password) return fail(400, { error: 'заполни все поля' });
-		if (password.length < 8) return fail(400, { error: 'пароль минимум 8 символов' });
+		if (!email || !password) return fail(400, { error: 'fill in all fields' });
+		if (password.length < 8) return fail(400, { error: 'password must be at least 8 characters' });
 
 		const [existing] = await db.select().from(users).where(eq(users.email, email)).limit(1);
-		if (existing) return fail(400, { error: 'этот email уже зарегистрирован' });
+		if (existing) return fail(400, { error: 'this email is already registered' });
 
 		const [user] = await db
 			.insert(users)

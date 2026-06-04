@@ -24,7 +24,7 @@
 			</svg>
 		</a>
 		<button class="save" form="entry-form" type="submit" disabled={saving}>
-			{saving ? '...' : 'сохранить'}
+			{saving ? '...' : 'save'}
 		</button>
 	</header>
 
@@ -47,7 +47,7 @@
 				class="field-title"
 				type="text"
 				name="description"
-				placeholder="описание"
+				placeholder="description"
 				maxlength="120"
 				autocomplete="off"
 			/>
@@ -61,7 +61,7 @@
 						<circle cx="8.5" cy="8.5" r="1.5"/>
 						<polyline points="21 15 16 10 5 21"/>
 					</svg>
-					<span>добавить фото</span>
+					<span>add photo</span>
 				{/if}
 				<input type="file" name="image" accept="image/*" onchange={onFileChange} />
 			</label>
@@ -69,7 +69,7 @@
 			<textarea
 				class="field-body"
 				name="body"
-				placeholder="что произошло..."
+				placeholder="what happened..."
 			></textarea>
 
 			{#if form?.error}

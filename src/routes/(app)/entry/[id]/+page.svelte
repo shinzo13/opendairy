@@ -7,7 +7,7 @@
 
 	function formatDate(iso: string) {
 		const d = new Date(iso + 'T00:00:00');
-		return d.toLocaleDateString('ru-RU', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+		return d.toLocaleDateString('en-US', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
 	}
 </script>
 
@@ -43,11 +43,11 @@
 {#if confirmDelete}
 	<div class="overlay" role="dialog" aria-modal="true">
 		<div class="dialog">
-			<p>удалить эту запись?</p>
+			<p>delete this entry?</p>
 			<div class="dialog-actions">
-				<button class="btn-cancel" onclick={() => (confirmDelete = false)}>отмена</button>
+				<button class="btn-cancel" onclick={() => (confirmDelete = false)}>cancel</button>
 				<form method="POST" action="?/delete" use:enhance>
-					<button type="submit" class="btn-delete">удалить</button>
+					<button type="submit" class="btn-delete">delete</button>
 				</form>
 			</div>
 		</div>

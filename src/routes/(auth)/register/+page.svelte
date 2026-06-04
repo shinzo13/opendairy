@@ -1,29 +1,27 @@
 <script lang="ts">
-	import { enhance } from '$app/forms';
 	import type { ActionData } from './$types';
-
 	let { form }: { form: ActionData } = $props();
 </script>
 
 <div class="auth-page">
-	<h1>создать аккаунт</h1>
+	<h1>create account</h1>
 
-	<form method="POST" use:enhance>
+	<form method="POST">
 		<label>
 			<span>email</span>
 			<input type="email" name="email" required autocomplete="email" />
 		</label>
 		<label>
-			<span>пароль</span>
+			<span>password</span>
 			<input type="password" name="password" required autocomplete="new-password" minlength="8" />
 		</label>
 		{#if form?.error}
 			<p class="error">{form.error}</p>
 		{/if}
-		<button type="submit">зарегистрироваться</button>
+		<button type="submit">sign up</button>
 	</form>
 
-	<p class="switch">уже есть аккаунт? <a href="/login">войти</a></p>
+	<p class="switch">already have an account? <a href="/login">sign in</a></p>
 </div>
 
 <style>
@@ -36,11 +34,7 @@
 		padding: 32px 24px;
 	}
 
-	h1 {
-		font-size: 24px;
-		font-weight: 700;
-		margin-bottom: 32px;
-	}
+	h1 { font-size: 24px; font-weight: 700; margin-bottom: 32px; }
 
 	form {
 		width: 100%;
@@ -50,16 +44,9 @@
 		gap: 16px;
 	}
 
-	label {
-		display: flex;
-		flex-direction: column;
-		gap: 6px;
-	}
+	label { display: flex; flex-direction: column; gap: 6px; }
 
-	span {
-		font-size: 12px;
-		color: var(--text-muted);
-	}
+	span { font-size: 12px; color: var(--text-muted); }
 
 	input {
 		background: var(--surface);
@@ -86,16 +73,8 @@
 		font-weight: 600;
 	}
 
-	.error {
-		font-size: 13px;
-		color: #ff6b6b;
-	}
+	.error { font-size: 13px; color: #ff6b6b; }
 
-	.switch {
-		margin-top: 24px;
-		font-size: 14px;
-		color: var(--text-muted);
-	}
-
+	.switch { margin-top: 24px; font-size: 14px; color: var(--text-muted); }
 	.switch a { color: var(--accent); }
 </style>

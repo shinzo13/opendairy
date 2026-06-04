@@ -11,9 +11,9 @@ export const actions: Actions = {
 		const body = (data.get('body') as string)?.trim() ?? '';
 		const image = data.get('image') as File;
 
-		if (!image || image.size === 0) return fail(400, { error: 'нужно добавить фото' });
-		if (!description) return fail(400, { error: 'нужно описание' });
-		if (!date) return fail(400, { error: 'укажи дату' });
+		if (!image || image.size === 0) return fail(400, { error: 'photo is required' });
+		if (!description) return fail(400, { error: 'description is required' });
+		if (!date) return fail(400, { error: 'date is required' });
 
 		const imageFilename = await saveUpload(image);
 
