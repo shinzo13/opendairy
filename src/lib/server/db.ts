@@ -1,0 +1,25 @@
+import { drizzle } from 'drizzle-orm/postgres-js';
+import postgres from 'postgres';
+import { pgTable, uuid, text, date, timestamp } from 'drizzle-orm/pg-core';
+
+export const users = pgTable('users', {
+	id: uuid('id').primaryKey().defaultRandom(),
+	email: text('email').notNull().unique(),
+	passwordHash: text('password_hash').notNull(),
+	createdAt: timestamp('created_at').defaultNow()
+});
+
+export const entries = pgTable('entries', {
+	id: uuid('id').primaryKey().defaultRandom(),
+	userId: uuid('user_id')
+		.notNull()
+		.references(() => users.id, { onDelete: 'cascade' }),
+	date: date('date').notNull(),
+	description: text('description').notNull(),
+	body: text('body').notNull().default(''),
+	imageFilename: text('image_filename').notNull(),
+	createdAt: timestamp('created_at').defaultNow()
+});
+
+const client = postgres(process.env.DATABASE_URL!);
+export const db = drizzle(client, { schema: { users, entries } });

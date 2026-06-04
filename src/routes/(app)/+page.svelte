@@ -1,24 +1,7 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
-	import { getEntries } from '$lib/db';
-	import type { DiaryEntry } from '$lib/types';
+	import type { PageData } from './$types';
 
-	let entries = $state<DiaryEntry[]>([]);
-	let imageUrls = $state<Record<string, string>>({});
-	let loading = $state(true);
-
-	onMount(async () => {
-		entries = await getEntries();
-		for (const e of entries) {
-			imageUrls[e.id] = URL.createObjectURL(e.imageBlob);
-		}
-		loading = false;
-		return () => {
-			for (const url of Object.values(imageUrls)) {
-				URL.revokeObjectURL(url);
-			}
-		};
-	});
+	let { data }: { data: PageData } = $props();
 
 	function formatDate(iso: string) {
 		const d = new Date(iso + 'T00:00:00');
@@ -38,9 +21,7 @@
 	</header>
 
 	<main>
-		{#if loading}
-			<div class="empty">загрузка...</div>
-		{:else if entries.length === 0}
+		{#if data.entries.length === 0}
 			<div class="empty">
 				<p>пока пусто</p>
 				<a href="/new" class="cta">добавить первую запись</a>
@@ -48,16 +29,14 @@
 		{:else}
 			<div class="timeline">
 				<div class="spine"></div>
-				{#each entries as entry, i (entry.id)}
+				{#each data.entries as entry, i (entry.id)}
 					{@const side = i % 2 === 0 ? 'left' : 'right'}
 					<div class="row {side}">
 						{#if side === 'left'}
 							<div class="spacer">
 								<a href="/entry/{entry.id}" class="card">
 									<div class="thumb">
-										{#if imageUrls[entry.id]}
-											<img src={imageUrls[entry.id]} alt={entry.description} />
-										{/if}
+										<img src="/api/uploads/{entry.imageFilename}" alt={entry.description} />
 									</div>
 									<div class="info">
 										<time>{formatDate(entry.date)}</time>
@@ -73,9 +52,7 @@
 							<div class="spacer">
 								<a href="/entry/{entry.id}" class="card">
 									<div class="thumb">
-										{#if imageUrls[entry.id]}
-											<img src={imageUrls[entry.id]} alt={entry.description} />
-										{/if}
+										<img src="/api/uploads/{entry.imageFilename}" alt={entry.description} />
 									</div>
 									<div class="info">
 										<time>{formatDate(entry.date)}</time>
@@ -110,11 +87,7 @@
 		border-bottom: 1px solid var(--surface2);
 	}
 
-	.logo {
-		font-size: 18px;
-		font-weight: 700;
-		letter-spacing: -0.3px;
-	}
+	.logo { font-size: 18px; font-weight: 700; letter-spacing: -0.3px; }
 
 	.add-btn {
 		display: flex;
@@ -127,10 +100,7 @@
 		color: #111;
 	}
 
-	main {
-		flex: 1;
-		padding: 24px 0 60px;
-	}
+	main { flex: 1; padding: 24px 0 60px; }
 
 	.empty {
 		display: flex;
@@ -150,24 +120,15 @@
 		font-weight: 600;
 	}
 
-	/* ── timeline ── */
-
-	.timeline {
-		position: relative;
-		display: flex;
-		flex-direction: column;
-		gap: 0;
-	}
+	.timeline { position: relative; display: flex; flex-direction: column; }
 
 	.spine {
 		position: absolute;
 		left: 50%;
-		top: 0;
-		bottom: 0;
+		top: 0; bottom: 0;
 		width: 2px;
 		transform: translateX(-50%);
 		background: var(--surface2);
-		z-index: 0;
 	}
 
 	.row {
@@ -178,65 +139,39 @@
 		padding: 12px 0;
 	}
 
-	/* центральный узел — маленький кружок на линии */
 	.node {
 		flex-shrink: 0;
-		width: 12px;
-		height: 12px;
+		width: 12px; height: 12px;
 		border-radius: 50%;
 		background: var(--accent);
 		border: 2px solid var(--bg);
 		z-index: 2;
 	}
 
-	/* пустая сторона напротив карточки — переопределено ниже */
-
-	/* ── half-sides ── */
-
-	/* каждая половина занимает ровно 50% минус узел */
-	.spacer {
-		flex: 1;
-		display: flex;
-	}
-
-	.row.left .spacer   { justify-content: flex-end; }
-	.row.right .spacer  { justify-content: flex-start; }
-
-	/* ── card ── */
+	.spacer { flex: 1; display: flex; }
+	.row.left .spacer  { justify-content: flex-end; }
+	.row.right .spacer { justify-content: flex-start; }
 
 	.card {
 		display: flex;
 		align-items: center;
 		gap: 10px;
 		padding: 6px 12px;
-		min-width: 0;
 		max-width: calc(50vw - 20px);
 	}
 
-	/* левая: [текст][картинка] — картинка ближе к центру */
-	.row.left .card {
-		flex-direction: row-reverse;
-	}
-
-	/* правая: [картинка][текст] — картинка ближе к центру */
-	.row.right .card {
-		flex-direction: row;
-	}
+	.row.left .card  { flex-direction: row-reverse; }
+	.row.right .card { flex-direction: row; }
 
 	.thumb {
 		flex-shrink: 0;
-		width: 64px;
-		height: 64px;
+		width: 64px; height: 64px;
 		border-radius: 10px;
 		overflow: hidden;
 		background: var(--surface2);
 	}
 
-	.thumb img {
-		width: 100%;
-		height: 100%;
-		object-fit: cover;
-	}
+	.thumb img { width: 100%; height: 100%; object-fit: cover; }
 
 	.info {
 		flex: 1;
@@ -249,17 +184,11 @@
 	.row.left .info  { text-align: right; }
 	.row.right .info { text-align: left; }
 
-	time {
-		font-size: 11px;
-		color: var(--accent);
-		font-weight: 600;
-		text-transform: lowercase;
-	}
+	time { font-size: 11px; color: var(--accent); font-weight: 600; }
 
 	p {
 		font-size: 13px;
 		line-height: 1.35;
-		color: var(--text);
 		display: -webkit-box;
 		-webkit-line-clamp: 2;
 		-webkit-box-orient: vertical;

@@ -26,6 +26,12 @@ Desktop.ini
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
 
+# Uploads (user data)
+/uploads
+
+# Local env
+.env
+
 # Editors
 .vscode/
 .idea/

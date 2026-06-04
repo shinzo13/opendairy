@@ -1,44 +1,18 @@
 <script lang="ts">
-	import { goto } from '$app/navigation';
-	import { saveEntry } from '$lib/db';
-	import type { DiaryEntry } from '$lib/types';
+	import { enhance } from '$app/forms';
+	import type { ActionData } from './$types';
 
-	let date = $state(new Date().toISOString().slice(0, 10));
-	let description = $state('');
-	let body = $state('');
-	let imageFile = $state<File | null>(null);
+	let { form }: { form: ActionData } = $props();
+
 	let imagePreview = $state<string | null>(null);
 	let saving = $state(false);
-	let error = $state('');
 
 	function onFileChange(e: Event) {
 		const input = e.target as HTMLInputElement;
 		const file = input.files?.[0];
 		if (!file) return;
-		imageFile = file;
 		if (imagePreview) URL.revokeObjectURL(imagePreview);
 		imagePreview = URL.createObjectURL(file);
-	}
-
-	async function submit() {
-		error = '';
-		if (!imageFile) { error = 'нужно добавить фото'; return; }
-		if (!description.trim()) { error = 'нужно описание'; return; }
-		saving = true;
-		try {
-			await saveEntry({
-				id: crypto.randomUUID(),
-				date,
-				description: description.trim(),
-				body: body.trim(),
-				imageBlob: imageFile,
-				createdAt: Date.now()
-			} satisfies DiaryEntry);
-			goto('/');
-		} catch {
-			error = 'ошибка при сохранении';
-			saving = false;
-		}
 	}
 </script>
 
@@ -49,24 +23,30 @@
 				<polyline points="15 18 9 12 15 6" />
 			</svg>
 		</a>
-		<button class="save" onclick={submit} disabled={saving}>
+		<button class="save" form="entry-form" type="submit" disabled={saving}>
 			{saving ? '...' : 'сохранить'}
 		</button>
 	</header>
 
-	<div class="content">
-		<!-- поля -->
+	<form
+		id="entry-form"
+		method="POST"
+		enctype="multipart/form-data"
+		use:enhance={() => {
+			saving = true;
+			return async ({ update }) => {
+				await update();
+				saving = false;
+			};
+		}}
+	>
 		<div class="fields">
-			<input
-				class="field-date"
-				type="date"
-				bind:value={date}
-			/>
+			<input class="field-date" type="date" name="date" value={new Date().toISOString().slice(0, 10)} />
 
 			<input
 				class="field-title"
 				type="text"
-				bind:value={description}
+				name="description"
 				placeholder="описание"
 				maxlength="120"
 				autocomplete="off"
@@ -83,20 +63,20 @@
 					</svg>
 					<span>добавить фото</span>
 				{/if}
-				<input type="file" accept="image/*" onchange={onFileChange} />
+				<input type="file" name="image" accept="image/*" onchange={onFileChange} />
 			</label>
 
 			<textarea
 				class="field-body"
-				bind:value={body}
+				name="body"
 				placeholder="что произошло..."
 			></textarea>
 
-			{#if error}
-				<p class="error">{error}</p>
+			{#if form?.error}
+				<p class="error">{form.error}</p>
 			{/if}
 		</div>
-	</div>
+	</form>
 </div>
 
 <style>
@@ -114,12 +94,7 @@
 		padding: 14px 20px;
 	}
 
-	.back {
-		display: flex;
-		align-items: center;
-		color: var(--text-muted);
-		padding: 4px;
-	}
+	.back { display: flex; align-items: center; color: var(--text-muted); padding: 4px; }
 
 	.save {
 		background: none;
@@ -127,12 +102,11 @@
 		color: var(--accent);
 		font-size: 15px;
 		font-weight: 600;
-		padding: 4px 0;
 	}
 
 	.save:disabled { opacity: 0.4; }
 
-	/* ── поля ── */
+	form { flex: 1; }
 
 	.fields {
 		display: flex;
@@ -168,6 +142,39 @@
 
 	.field-title::placeholder { color: var(--surface2); }
 
+	.photo-btn {
+		display: inline-flex;
+		align-items: center;
+		gap: 8px;
+		padding: 7px 14px;
+		border-radius: 8px;
+		background: var(--surface);
+		color: var(--text-muted);
+		font-size: 13px;
+		cursor: pointer;
+		margin: 12px 0 8px;
+		border: 1px solid var(--surface2);
+	}
+
+	.photo-btn input[type="file"] { display: none; }
+
+	.photo-btn.has-image {
+		padding: 0;
+		border-radius: 10px;
+		overflow: hidden;
+		border: none;
+		width: 100%;
+		aspect-ratio: 4/3;
+		margin: 12px 0;
+	}
+
+	.photo-btn.has-image img {
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+		display: block;
+	}
+
 	.field-body {
 		background: none;
 		border: none;
@@ -184,43 +191,5 @@
 
 	.field-body::placeholder { color: var(--surface2); }
 
-	/* ── фото ── */
-
-	.photo-btn {
-		display: inline-flex;
-		align-items: center;
-		gap: 8px;
-		padding: 7px 14px;
-		border-radius: 8px;
-		background: var(--surface);
-		color: var(--text-muted);
-		font-size: 13px;
-		cursor: pointer;
-		margin: 4px 0 8px;
-		border: 1px solid var(--surface2);
-	}
-
-	.photo-btn input[type="file"] { display: none; }
-
-	.photo-btn.has-image {
-		padding: 0;
-		border-radius: 10px;
-		overflow: hidden;
-		border: none;
-		width: 100%;
-		aspect-ratio: 4/3;
-	}
-
-	.photo-btn.has-image img {
-		width: 100%;
-		height: 100%;
-		object-fit: cover;
-		display: block;
-	}
-
-	.error {
-		font-size: 13px;
-		color: #ff6b6b;
-		margin-top: 4px;
-	}
+	.error { font-size: 13px; color: #ff6b6b; margin-top: 4px; }
 </style>
