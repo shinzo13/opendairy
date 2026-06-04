@@ -216,10 +216,8 @@
 		z-index: 3;
 		margin-top: 16px;
 		padding: 6px 12px;
-		background: var(--bg);
 		color: var(--dimmer);
 		font-size: 12.5px;
-		font-family: var(--serif);
 		font-style: italic;
 	}
 
@@ -285,8 +283,7 @@
 	time { font-size: 12px; color: var(--accent); font-weight: 700; }
 
 	p {
-		font-family: var(--serif);
-		font-size: 17px; line-height: 1.2;
+		font-size: 14px; font-weight: 600; line-height: 1.35;
 		display: -webkit-box;
 		-webkit-line-clamp: 2;
 		-webkit-box-orient: vertical;
@@ -354,7 +351,7 @@
 		.card { gap: 16px; padding: 12px; max-width: 380px; }
 		.thumb { width: 110px; height: 110px; border-radius: 16px; }
 		time { font-size: 14px; }
-		p { font-size: 19px; }
+		p { font-size: 16px; }
 
 		.profile-sheet {
 			max-width: 400px;

@@ -96,7 +96,7 @@
 	}
 
 	time { font-size: 12px; color: var(--accent); font-weight: 700; text-transform: lowercase; }
-	h1 { font-family: var(--serif); font-size: 28px; font-weight: 500; line-height: 1.15; }
+	h1 { font-size: 24px; font-weight: 700; line-height: 1.25; }
 	.mood {
 		display: inline-flex; align-items: center; gap: 6px;
 		font-size: 12.5px; color: var(--dim);
