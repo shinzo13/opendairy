@@ -44,9 +44,9 @@
 		{:else}
 			<div class="stage">
 				<aside class="side">
-					<StatsPanel {entries} />
-					<MiniCalendar {entries} />
-					<LookingBack {entries} />
+					<div class="cell"><StatsPanel {entries} /></div>
+					<div class="cell"><MiniCalendar {entries} /></div>
+					<div class="cell wide"><LookingBack {entries} /></div>
 				</aside>
 
 				<div class="timeline-wrap">
@@ -124,7 +124,7 @@
 {/if}
 
 <style>
-	.page { display: flex; flex-direction: column; min-height: 100dvh; }
+	.page { display: flex; flex-direction: column; height: 100dvh; overflow: hidden; }
 
 	header {
 		position: sticky;
@@ -157,7 +157,7 @@
 	}
 	.avatar-btn:hover { border-color: var(--accent); color: var(--text); }
 
-	main { flex: 1; padding: 24px 0 60px; }
+	main { flex: 1; min-height: 0; }
 
 	.empty {
 		display: flex;
@@ -178,8 +178,18 @@
 	}
 
 	/* ── stage (mobile: single column, panels hidden) ── */
-	.stage { display: block; }
+	.stage { display: block; height: 100%; }
 	.side { display: none; }
+
+	/* timeline is its own scroll container (no visible scrollbar) */
+	.timeline-wrap {
+		height: 100%;
+		overflow-y: auto;
+		padding: 16px 0 60px;
+		scrollbar-width: none;
+		-ms-overflow-style: none;
+	}
+	.timeline-wrap::-webkit-scrollbar { width: 0; height: 0; }
 
 	/* ── timeline ── */
 
@@ -345,7 +355,7 @@
 	@media (min-width: 768px) {
 		header { padding: 20px 32px; }
 		.logo { font-size: 23px; }
-		main { padding: 40px 0 80px; }
+		.timeline-wrap { padding: 30px 0 80px; }
 		.timeline { max-width: 720px; margin: 0 auto; }
 		.row { padding: 18px 0; }
 		.card { gap: 16px; padding: 12px; max-width: 380px; }
@@ -363,25 +373,30 @@
 		}
 	}
 
-	/* ── desktop: side panel column appears ── */
-	@media (min-width: 880px) {
+	/* ── desktop: side panels (2-up + 1 wide), fixed while timeline scrolls ── */
+	@media (min-width: 1180px) {
 		.stage {
 			display: grid;
-			grid-template-columns: 244px minmax(0, 1fr);
-			gap: 24px;
-			max-width: 1180px;
+			grid-template-columns: 480px minmax(0, 1fr);
+			gap: 28px;
+			max-width: 1320px;
 			margin: 0 auto;
 			padding: 0 30px;
-			align-items: start;
 		}
 		.side {
-			display: flex;
-			flex-direction: column;
+			display: grid;
+			grid-template-columns: 1fr 1fr;
 			gap: 18px;
-			position: sticky;
-			top: 96px;
+			align-content: start;
+			max-height: 100%;
+			overflow-y: auto;
+			padding: 30px 0;
+			scrollbar-width: none;
+			-ms-overflow-style: none;
 		}
-		.timeline-wrap { min-width: 0; }
+		.side::-webkit-scrollbar { width: 0; height: 0; }
+		.cell.wide { grid-column: 1 / -1; }
+		.timeline-wrap { min-width: 0; padding: 30px 30px 80px; }
 		.timeline { margin: 0 auto; }
 	}
 </style>
