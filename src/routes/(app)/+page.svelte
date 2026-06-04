@@ -1,21 +1,21 @@
 <script lang="ts">
 	import { replaceState } from '$app/navigation';
-	import { page } from '$app/state';
 	import Toast from '$lib/components/Toast.svelte';
+	import StatsPanel from '$lib/components/StatsPanel.svelte';
+	import MiniCalendar from '$lib/components/MiniCalendar.svelte';
+	import LookingBack from '$lib/components/LookingBack.svelte';
+	import { MOODS, fmtShort, type Entry } from '$lib/diary';
 	import type { PageData } from './$types';
 
 	let { data }: { data: PageData } = $props();
+
+	const entries = $derived(data.entries as Entry[]);
 
 	let menuOpen = $state(false);
 
 	$effect(() => {
 		if (data.welcome) replaceState('/', {});
 	});
-
-	function formatDate(iso: string) {
-		const d = new Date(iso + 'T00:00:00');
-		return d.toLocaleDateString('en-US', { day: 'numeric', month: 'short' });
-	}
 </script>
 
 {#if data.welcome}
@@ -24,7 +24,7 @@
 
 <div class="page">
 	<header>
-		<span class="logo">opendiary</span>
+		<span class="logo">opendiary<span class="dot">.</span></span>
 		<div class="header-right">
 			<button class="avatar-btn" onclick={() => (menuOpen = true)} aria-label="profile">
 				<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -36,55 +36,71 @@
 	</header>
 
 	<main>
-		{#if data.entries.length === 0}
+		{#if entries.length === 0}
 			<div class="empty">
 				<p>nothing here yet</p>
 				<a href="/new" class="cta">add first entry</a>
 			</div>
 		{:else}
-			<div class="timeline">
-				<div class="spine"></div>
-				<a href="/new" class="add-node" aria-label="new entry">
-					<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
-						<line x1="12" y1="5" x2="12" y2="19" />
-						<line x1="5" y1="12" x2="19" y2="12" />
-					</svg>
-				</a>
-				{#each data.entries as entry, i (entry.id)}
-					{@const side = i % 2 === 0 ? 'left' : 'right'}
-					<div class="row {side}">
-						{#if side === 'left'}
-							<div class="spacer">
-								<a href="/entry/{entry.id}" class="card">
-									<div class="thumb">
-										<img src="/api/uploads/{entry.imageFilename}" alt={entry.description} />
+			<div class="stage">
+				<aside class="side">
+					<StatsPanel {entries} />
+					<MiniCalendar {entries} />
+					<LookingBack {entries} />
+				</aside>
+
+				<div class="timeline-wrap">
+					<div class="timeline">
+						<div class="spine"></div>
+						<a href="/new" class="add-node" aria-label="new entry">
+							<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+								<line x1="12" y1="5" x2="12" y2="19" />
+								<line x1="5" y1="12" x2="19" y2="12" />
+							</svg>
+						</a>
+						{#each entries as entry, i (entry.id)}
+							{@const side = i % 2 === 0 ? 'left' : 'right'}
+							<div class="row {side}">
+								{#if side === 'left'}
+									<div class="spacer">
+										<a href="/entry/{entry.id}" class="card">
+											<div class="thumb">
+												<img src="/api/uploads/{entry.imageFilename}" alt={entry.description} />
+											</div>
+											<div class="info">
+												<time>{fmtShort(entry.date)}</time>
+												<p>{entry.description}</p>
+												{#if entry.mood && MOODS[entry.mood]}
+													<span class="mood"><i style="background: {MOODS[entry.mood].color}"></i>{MOODS[entry.mood].label}</span>
+												{/if}
+											</div>
+										</a>
 									</div>
-									<div class="info">
-										<time>{formatDate(entry.date)}</time>
-										<p>{entry.description}</p>
+									<div class="node"></div>
+									<div class="spacer"></div>
+								{:else}
+									<div class="spacer"></div>
+									<div class="node"></div>
+									<div class="spacer">
+										<a href="/entry/{entry.id}" class="card">
+											<div class="thumb">
+												<img src="/api/uploads/{entry.imageFilename}" alt={entry.description} />
+											</div>
+											<div class="info">
+												<time>{fmtShort(entry.date)}</time>
+												<p>{entry.description}</p>
+												{#if entry.mood && MOODS[entry.mood]}
+													<span class="mood"><i style="background: {MOODS[entry.mood].color}"></i>{MOODS[entry.mood].label}</span>
+												{/if}
+											</div>
+										</a>
 									</div>
-								</a>
+								{/if}
 							</div>
-							<div class="node"></div>
-							<div class="spacer"></div>
-						{:else}
-							<div class="spacer"></div>
-							<div class="node"></div>
-							<div class="spacer">
-								<a href="/entry/{entry.id}" class="card">
-									<div class="thumb">
-										<img src="/api/uploads/{entry.imageFilename}" alt={entry.description} />
-									</div>
-									<div class="info">
-										<time>{formatDate(entry.date)}</time>
-										<p>{entry.description}</p>
-									</div>
-								</a>
-							</div>
-						{/if}
+						{/each}
+						<span class="origin">where it began</span>
 					</div>
-				{/each}
-				<span class="origin">where it began</span>
+				</div>
 			</div>
 		{/if}
 	</main>
@@ -113,16 +129,18 @@
 	header {
 		position: sticky;
 		top: 0;
-		z-index: 10;
+		z-index: 30;
 		display: flex;
 		align-items: center;
 		justify-content: space-between;
 		padding: 16px 20px;
-		background: var(--bg);
-		border-bottom: 1px solid var(--surface2);
+		backdrop-filter: blur(14px) saturate(1.1);
+		background: color-mix(in oklch, var(--bg) 72%, transparent);
+		border-bottom: 1px solid color-mix(in oklch, var(--line) 50%, transparent);
 	}
 
-	.logo { font-size: 18px; font-weight: 700; letter-spacing: -0.3px; }
+	.logo { font-size: 20px; font-weight: 800; letter-spacing: -0.02em; }
+	.logo .dot { color: var(--accent); }
 
 	.header-right { display: flex; align-items: center; gap: 8px; }
 
@@ -130,12 +148,14 @@
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		width: 40px; height: 40px;
+		width: 42px; height: 42px;
 		border-radius: 50%;
-		background: var(--surface);
-		border: 1px solid var(--surface2);
-		color: var(--text-muted);
+		background: var(--card);
+		border: 1px solid var(--line);
+		color: var(--dim);
+		transition: 0.2s;
 	}
+	.avatar-btn:hover { border-color: var(--accent); color: var(--text); }
 
 	main { flex: 1; padding: 24px 0 60px; }
 
@@ -145,17 +165,21 @@
 		align-items: center;
 		gap: 16px;
 		margin-top: 80px;
-		color: var(--text-muted);
+		color: var(--dim);
 		font-size: 16px;
 	}
 
 	.cta {
 		padding: 12px 24px;
 		background: var(--accent);
-		color: #111;
+		color: #1a1304;
 		border-radius: var(--radius);
-		font-weight: 600;
+		font-weight: 700;
 	}
+
+	/* ── stage (mobile: single column, panels hidden) ── */
+	.stage { display: block; }
+	.side { display: none; }
 
 	/* ── timeline ── */
 
@@ -163,10 +187,10 @@
 
 	.spine {
 		position: absolute;
-		left: 50%; top: 0; bottom: 0;
+		left: 50%; top: 56px; bottom: 30px;
 		width: 2px;
 		transform: translateX(-50%);
-		background: var(--surface2);
+		background: linear-gradient(var(--accent), color-mix(in oklch, var(--accent) 25%, transparent) 70%, transparent);
 	}
 
 	.add-node {
@@ -176,13 +200,15 @@
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		width: 44px; height: 44px;
+		width: 54px; height: 54px;
 		border-radius: 50%;
 		background: var(--accent);
-		color: #111;
-		border: 3px solid var(--bg);
-		margin-bottom: 8px;
+		color: #1a1304;
+		margin-bottom: 18px;
+		box-shadow: 0 0 0 6px color-mix(in oklch, var(--accent) 16%, transparent), 0 10px 30px rgba(0, 0, 0, 0.5);
+		transition: 0.2s;
 	}
+	.add-node:hover { transform: scale(1.08) rotate(90deg); }
 
 	.origin {
 		align-self: center;
@@ -191,9 +217,10 @@
 		margin-top: 16px;
 		padding: 6px 12px;
 		background: var(--bg);
-		color: var(--text-muted);
-		font-size: 12px;
-		letter-spacing: 0.3px;
+		color: var(--dimmer);
+		font-size: 12.5px;
+		font-family: var(--serif);
+		font-style: italic;
 	}
 
 	.row {
@@ -206,10 +233,10 @@
 
 	.node {
 		flex-shrink: 0;
-		width: 12px; height: 12px;
+		width: 11px; height: 11px;
 		border-radius: 50%;
 		background: var(--accent);
-		border: 2px solid var(--bg);
+		box-shadow: 0 0 12px color-mix(in oklch, var(--accent) 60%, transparent);
 		z-index: 2;
 	}
 
@@ -221,9 +248,12 @@
 		display: flex;
 		align-items: center;
 		gap: 10px;
-		padding: 6px 12px;
+		padding: 8px 12px;
 		max-width: calc(50vw - 20px);
+		border-radius: 20px;
+		transition: transform 0.22s cubic-bezier(0.2, 0.7, 0.3, 1), background 0.22s;
 	}
+	.card:hover { transform: translateY(-4px); background: color-mix(in oklch, var(--panel) 50%, transparent); }
 
 	.row.left .card  { flex-direction: row-reverse; }
 	.row.right .card { flex-direction: row; }
@@ -231,9 +261,15 @@
 	.thumb {
 		flex-shrink: 0;
 		width: 64px; height: 64px;
-		border-radius: 10px;
+		border-radius: 14px;
 		overflow: hidden;
-		background: var(--surface2);
+		background: var(--card);
+		box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
+		transition: filter 0.22s, box-shadow 0.22s;
+	}
+	.card:hover .thumb {
+		filter: brightness(1.08);
+		box-shadow: 0 12px 34px rgba(0, 0, 0, 0.55), 0 0 0 1px color-mix(in oklch, var(--accent) 40%, transparent);
 	}
 
 	.thumb img { width: 100%; height: 100%; object-fit: cover; }
@@ -243,24 +279,32 @@
 		display: flex; flex-direction: column; gap: 4px;
 	}
 
-	.row.left .info  { text-align: right; }
-	.row.right .info { text-align: left; }
+	.row.left .info  { text-align: right; align-items: flex-end; }
+	.row.right .info { text-align: left; align-items: flex-start; }
 
-	time { font-size: 11px; color: var(--accent); font-weight: 600; }
+	time { font-size: 12px; color: var(--accent); font-weight: 700; }
 
 	p {
-		font-size: 13px; line-height: 1.35;
+		font-family: var(--serif);
+		font-size: 17px; line-height: 1.2;
 		display: -webkit-box;
 		-webkit-line-clamp: 2;
 		-webkit-box-orient: vertical;
+		line-clamp: 2;
 		overflow: hidden;
 	}
+
+	.mood {
+		display: inline-flex; align-items: center; gap: 5px;
+		font-size: 11.5px; color: var(--dim); margin-top: 1px;
+	}
+	.mood i { width: 7px; height: 7px; border-radius: 50%; }
 
 	/* ── профиль ── */
 
 	.overlay {
 		position: fixed; inset: 0;
-		background: rgba(0,0,0,0.5);
+		background: rgba(0, 0, 0, 0.5);
 		z-index: 50;
 	}
 
@@ -268,7 +312,8 @@
 		position: fixed;
 		bottom: 0; left: 0; right: 0;
 		z-index: 51;
-		background: var(--surface);
+		background: var(--panel);
+		border: 1px solid var(--panel-line);
 		border-radius: 20px 20px 0 0;
 		padding: 24px 20px 40px;
 		display: flex;
@@ -278,13 +323,13 @@
 
 	.profile-email {
 		font-size: 13px;
-		color: var(--text-muted);
+		color: var(--dim);
 		padding-bottom: 16px;
 	}
 
 	.divider {
 		height: 1px;
-		background: var(--surface2);
+		background: var(--line);
 		margin-bottom: 8px;
 	}
 
@@ -299,33 +344,17 @@
 
 	.menu-item.danger { color: #ff6b6b; }
 
-	/* ── desktop ── */
+	/* ── tablet: roomier timeline ── */
 	@media (min-width: 768px) {
 		header { padding: 20px 32px; }
-
-		.logo { font-size: 22px; }
-
-		.add-btn, .avatar-btn { width: 44px; height: 44px; }
-
+		.logo { font-size: 23px; }
 		main { padding: 40px 0 80px; }
-
-		.timeline {
-			max-width: 720px;
-			margin: 0 auto;
-		}
-
+		.timeline { max-width: 720px; margin: 0 auto; }
 		.row { padding: 18px 0; }
-
-		.card {
-			gap: 16px;
-			padding: 8px 20px;
-			max-width: calc(360px - 20px);
-		}
-
-		.thumb { width: 96px; height: 96px; border-radius: 14px; }
-
-		time { font-size: 13px; }
-		p { font-size: 15px; }
+		.card { gap: 16px; padding: 12px; max-width: 380px; }
+		.thumb { width: 110px; height: 110px; border-radius: 16px; }
+		time { font-size: 14px; }
+		p { font-size: 19px; }
 
 		.profile-sheet {
 			max-width: 400px;
@@ -335,5 +364,27 @@
 			border-radius: 20px;
 			bottom: 24px;
 		}
+	}
+
+	/* ── desktop: side panel column appears ── */
+	@media (min-width: 880px) {
+		.stage {
+			display: grid;
+			grid-template-columns: 244px minmax(0, 1fr);
+			gap: 24px;
+			max-width: 1180px;
+			margin: 0 auto;
+			padding: 0 30px;
+			align-items: start;
+		}
+		.side {
+			display: flex;
+			flex-direction: column;
+			gap: 18px;
+			position: sticky;
+			top: 96px;
+		}
+		.timeline-wrap { min-width: 0; }
+		.timeline { margin: 0 auto; }
 	}
 </style>

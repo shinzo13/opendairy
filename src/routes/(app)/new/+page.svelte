@@ -1,11 +1,13 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
+	import { MOODS, MOOD_CHOICES } from '$lib/diary';
 	import type { ActionData } from './$types';
 
 	let { form }: { form: ActionData } = $props();
 
 	let imagePreview = $state<string | null>(null);
 	let saving = $state(false);
+	let mood = $state<string | null>(null);
 
 	function onFileChange(e: Event) {
 		const input = e.target as HTMLInputElement;
@@ -71,6 +73,21 @@
 				name="body"
 				placeholder="what happened..."
 			></textarea>
+
+			<input type="hidden" name="mood" value={mood ?? ''} />
+			<div class="mood-label">how it felt</div>
+			<div class="chips">
+				{#each MOOD_CHOICES as m (m)}
+					<button
+						type="button"
+						class="chip"
+						class:on={mood === m}
+						onclick={() => (mood = mood === m ? null : m)}
+					>
+						<i style="background: {MOODS[m].color}"></i>{MOODS[m].label}
+					</button>
+				{/each}
+			</div>
 
 			{#if form?.error}
 				<p class="error">{form.error}</p>
@@ -191,7 +208,41 @@
 
 	.field-body::placeholder { color: var(--surface2); }
 
-	.error { font-size: 13px; color: #ff6b6b; margin-top: 4px; }
+	.mood-label {
+		font-size: 12px;
+		font-weight: 700;
+		letter-spacing: 0.05em;
+		text-transform: uppercase;
+		color: var(--dim);
+		margin: 8px 0 10px;
+	}
+
+	.chips { display: flex; flex-wrap: wrap; gap: 8px; }
+
+	.chips .chip {
+		display: inline-flex;
+		align-items: center;
+		gap: 7px;
+		padding: 7px 13px;
+		border-radius: 999px;
+		border: 1px solid var(--line);
+		background: var(--card);
+		color: var(--dim);
+		font-size: 13px;
+		font-family: inherit;
+		cursor: pointer;
+		transition: 0.15s;
+	}
+
+	.chips .chip i { width: 9px; height: 9px; border-radius: 50%; }
+
+	.chips .chip.on {
+		color: var(--text);
+		border-color: color-mix(in oklch, var(--accent) 60%, transparent);
+		background: var(--accent-soft);
+	}
+
+	.error { font-size: 13px; color: #ff6b6b; margin-top: 12px; }
 
 	/* ── desktop ── */
 	@media (min-width: 768px) {

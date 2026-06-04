@@ -1,9 +1,11 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
+	import { MOODS } from '$lib/diary';
 	import type { PageData } from './$types';
 
 	let { data }: { data: PageData } = $props();
 	let confirmDelete = $state(false);
+	const mood = $derived(data.entry.mood && MOODS[data.entry.mood] ? MOODS[data.entry.mood] : null);
 
 	function formatDate(iso: string) {
 		const d = new Date(iso + 'T00:00:00');
@@ -34,6 +36,9 @@
 	<article>
 		<time>{formatDate(data.entry.date)}</time>
 		<h1>{data.entry.description}</h1>
+		{#if mood}
+			<span class="mood"><i style="background: {mood.color}"></i>{mood.label}</span>
+		{/if}
 		{#if data.entry.body}
 			<p class="body">{data.entry.body}</p>
 		{/if}
@@ -90,9 +95,14 @@
 		gap: 12px;
 	}
 
-	time { font-size: 12px; color: var(--accent); font-weight: 600; text-transform: lowercase; }
-	h1 { font-size: 20px; font-weight: 700; line-height: 1.3; }
-	.body { font-size: 15px; line-height: 1.7; color: #ccc; white-space: pre-wrap; }
+	time { font-size: 12px; color: var(--accent); font-weight: 700; text-transform: lowercase; }
+	h1 { font-family: var(--serif); font-size: 28px; font-weight: 500; line-height: 1.15; }
+	.mood {
+		display: inline-flex; align-items: center; gap: 6px;
+		font-size: 12.5px; color: var(--dim);
+	}
+	.mood i { width: 8px; height: 8px; border-radius: 50%; }
+	.body { font-family: var(--serif); font-size: 17px; line-height: 1.6; color: var(--dim); white-space: pre-wrap; }
 
 	.overlay {
 		position: fixed;
