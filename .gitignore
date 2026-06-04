@@ -29,6 +29,9 @@ vite.config.ts.timestamp-*
 # Uploads (user data)
 /uploads
 
+# Design reference bundle
+/.design
+
 # Local env
 .env
 
