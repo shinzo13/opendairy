@@ -44,11 +44,9 @@
 			</div>
 		{:else}
 			<button class="panels-toggle" onclick={() => (panelsOpen = true)} aria-label="open insights">
-				<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-					<line x1="4" y1="7" x2="20" y2="7" /><circle cx="9" cy="7" r="2.4" fill="var(--bg)" />
-					<line x1="4" y1="14" x2="20" y2="14" /><circle cx="15" cy="14" r="2.4" fill="var(--bg)" />
+				<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+					<polyline points="9 18 15 12 9 6" />
 				</svg>
-				<span>insights</span>
 			</button>
 
 			<div class="stage">
@@ -382,23 +380,20 @@
 	/* ── mobile insights drawer ── */
 	.panels-toggle {
 		position: absolute;
-		top: 64px;
+		top: 76px;
 		left: 12px;
 		z-index: 25;
 		display: inline-flex;
 		align-items: center;
-		gap: 7px;
-		padding: 8px 14px 8px 11px;
-		border-radius: 999px;
+		justify-content: center;
+		width: 34px; height: 34px;
+		border-radius: 50%;
 		background: color-mix(in oklch, var(--panel) 88%, transparent);
 		border: 1px solid var(--panel-line);
 		backdrop-filter: blur(10px);
-		color: var(--text);
-		font-size: 13px;
-		font-weight: 600;
+		color: var(--accent);
 		box-shadow: 0 6px 18px rgba(0, 0, 0, 0.35);
 	}
-	.panels-toggle svg { color: var(--accent); }
 
 	.drawer-overlay {
 		position: fixed;
