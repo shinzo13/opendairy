@@ -24,14 +24,8 @@
 
 <div class="page">
 	<header>
-		<span class="logo">OpenDiary</span>
+		<span class="logo">opendiary</span>
 		<div class="header-right">
-			<a href="/new" class="add-btn" aria-label="new entry">
-				<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
-					<line x1="12" y1="5" x2="12" y2="19" />
-					<line x1="5" y1="12" x2="19" y2="12" />
-				</svg>
-			</a>
 			<button class="avatar-btn" onclick={() => (menuOpen = true)} aria-label="profile">
 				<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
 					<circle cx="12" cy="8" r="4" />
@@ -50,6 +44,12 @@
 		{:else}
 			<div class="timeline">
 				<div class="spine"></div>
+				<a href="/new" class="add-node" aria-label="new entry">
+					<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+						<line x1="12" y1="5" x2="12" y2="19" />
+						<line x1="5" y1="12" x2="19" y2="12" />
+					</svg>
+				</a>
 				{#each data.entries as entry, i (entry.id)}
 					{@const side = i % 2 === 0 ? 'left' : 'right'}
 					<div class="row {side}">
@@ -84,6 +84,7 @@
 						{/if}
 					</div>
 				{/each}
+				<span class="origin">where it began</span>
 			</div>
 		{/if}
 	</main>
@@ -124,16 +125,6 @@
 	.logo { font-size: 18px; font-weight: 700; letter-spacing: -0.3px; }
 
 	.header-right { display: flex; align-items: center; gap: 8px; }
-
-	.add-btn {
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		width: 40px; height: 40px;
-		border-radius: 50%;
-		background: var(--accent);
-		color: #111;
-	}
 
 	.avatar-btn {
 		display: flex;
@@ -176,6 +167,33 @@
 		width: 2px;
 		transform: translateX(-50%);
 		background: var(--surface2);
+	}
+
+	.add-node {
+		align-self: center;
+		position: relative;
+		z-index: 3;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		width: 44px; height: 44px;
+		border-radius: 50%;
+		background: var(--accent);
+		color: #111;
+		border: 3px solid var(--bg);
+		margin-bottom: 8px;
+	}
+
+	.origin {
+		align-self: center;
+		position: relative;
+		z-index: 3;
+		margin-top: 16px;
+		padding: 6px 12px;
+		background: var(--bg);
+		color: var(--text-muted);
+		font-size: 12px;
+		letter-spacing: 0.3px;
 	}
 
 	.row {
