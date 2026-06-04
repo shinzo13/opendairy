@@ -12,6 +12,7 @@
 	const entries = $derived(data.entries as Entry[]);
 
 	let menuOpen = $state(false);
+	let panelsOpen = $state(false);
 
 	$effect(() => {
 		if (data.welcome) replaceState('/', {});
@@ -42,6 +43,14 @@
 				<a href="/new" class="cta">add first entry</a>
 			</div>
 		{:else}
+			<button class="panels-toggle" onclick={() => (panelsOpen = true)} aria-label="open insights">
+				<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+					<line x1="4" y1="7" x2="20" y2="7" /><circle cx="9" cy="7" r="2.4" fill="var(--bg)" />
+					<line x1="4" y1="14" x2="20" y2="14" /><circle cx="15" cy="14" r="2.4" fill="var(--bg)" />
+				</svg>
+				<span>insights</span>
+			</button>
+
 			<div class="stage">
 				<aside class="side">
 					<div class="cell"><StatsPanel {entries} /></div>
@@ -102,6 +111,25 @@
 					</div>
 				</div>
 			</div>
+
+			{#if panelsOpen}
+				<div class="drawer-overlay" role="presentation" onclick={() => (panelsOpen = false)}></div>
+				<aside class="drawer">
+					<div class="drawer-head">
+						<span>insights</span>
+						<button class="drawer-close" onclick={() => (panelsOpen = false)} aria-label="close">
+							<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+								<line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" />
+							</svg>
+						</button>
+					</div>
+					<div class="drawer-body">
+						<StatsPanel {entries} />
+						<MiniCalendar {entries} />
+						<LookingBack {entries} />
+					</div>
+				</aside>
+			{/if}
 		{/if}
 	</main>
 </div>
@@ -124,7 +152,7 @@
 {/if}
 
 <style>
-	.page { display: flex; flex-direction: column; height: 100dvh; overflow: hidden; }
+	.page { position: relative; display: flex; flex-direction: column; height: 100dvh; overflow: hidden; }
 
 	header {
 		position: sticky;
@@ -351,6 +379,86 @@
 
 	.menu-item.danger { color: #ff6b6b; }
 
+	/* ── mobile insights drawer ── */
+	.panels-toggle {
+		position: absolute;
+		top: 64px;
+		left: 12px;
+		z-index: 25;
+		display: inline-flex;
+		align-items: center;
+		gap: 7px;
+		padding: 8px 14px 8px 11px;
+		border-radius: 999px;
+		background: color-mix(in oklch, var(--panel) 88%, transparent);
+		border: 1px solid var(--panel-line);
+		backdrop-filter: blur(10px);
+		color: var(--text);
+		font-size: 13px;
+		font-weight: 600;
+		box-shadow: 0 6px 18px rgba(0, 0, 0, 0.35);
+	}
+	.panels-toggle svg { color: var(--accent); }
+
+	.drawer-overlay {
+		position: fixed;
+		inset: 0;
+		z-index: 55;
+		background: rgba(0, 0, 0, 0.5);
+		animation: fade 0.2s ease;
+	}
+
+	.drawer {
+		position: fixed;
+		top: 0; left: 0; bottom: 0;
+		z-index: 56;
+		width: min(86vw, 360px);
+		background: var(--bg);
+		border-right: 1px solid var(--panel-line);
+		overflow-y: auto;
+		scrollbar-width: none;
+		-ms-overflow-style: none;
+		animation: slide-in 0.26s cubic-bezier(0.2, 0.7, 0.3, 1);
+	}
+	.drawer::-webkit-scrollbar { width: 0; height: 0; }
+
+	.drawer-head {
+		position: sticky;
+		top: 0;
+		z-index: 1;
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		padding: 18px 16px 12px;
+		background: var(--bg);
+		font-size: 12px;
+		font-weight: 700;
+		letter-spacing: 0.08em;
+		text-transform: uppercase;
+		color: var(--dim);
+	}
+
+	.drawer-close {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		width: 34px; height: 34px;
+		border-radius: 50%;
+		background: var(--card);
+		border: 1px solid var(--line);
+		color: var(--dim);
+	}
+
+	.drawer-body {
+		display: flex;
+		flex-direction: column;
+		gap: 16px;
+		padding: 4px 16px 32px;
+	}
+
+	@keyframes fade { from { opacity: 0; } }
+	@keyframes slide-in { from { transform: translateX(-100%); } }
+
 	/* ── tablet: roomier timeline ── */
 	@media (min-width: 768px) {
 		header { padding: 20px 32px; }
@@ -398,5 +506,7 @@
 		.cell.wide { grid-column: 1 / -1; }
 		.timeline-wrap { min-width: 0; padding: 30px 30px 80px; }
 		.timeline { margin: 0 auto; }
+
+		.panels-toggle, .drawer, .drawer-overlay { display: none; }
 	}
 </style>
