@@ -12,14 +12,14 @@
 	{#if counts.length === 0}
 		<p class="empty">no moods logged yet</p>
 	{:else}
-		<div class="chart">
+		<div class="rows">
 			{#each counts as [m, n] (m)}
-				<div class="col" title="{MOODS[m].label}: {n}">
-					<span class="cnt">{n}</span>
-					<div class="track">
-						<div class="bar" style="height: {(n / max) * 100}%; background: {MOODS[m].color}"></div>
-					</div>
+				<div class="row">
 					<span class="lbl">{MOODS[m].label}</span>
+					<div class="track">
+						<div class="bar" style="width: {(n / max) * 100}%; background: {MOODS[m].color}"></div>
+						<span class="cnt">{n}</span>
+					</div>
 				</div>
 			{/each}
 		</div>
@@ -43,40 +43,27 @@
 	}
 	.empty { font-size: 13px; color: var(--dim); }
 
-	.chart {
-		display: flex;
-		align-items: flex-end;
-		gap: 8px;
-		padding-bottom: 26px; /* room for rotated labels */
-	}
-	.col {
-		flex: 1;
-		min-width: 0;
-		display: flex;
-		flex-direction: column;
+	.rows { display: flex; flex-direction: column; gap: 10px; }
+	.row {
+		display: grid;
+		grid-template-columns: 84px 1fr;
 		align-items: center;
-		gap: 6px;
-	}
-	.cnt { font-size: 11px; font-weight: 700; color: var(--dim); }
-	.track {
-		width: 100%;
-		height: 96px;
-		display: flex;
-		align-items: flex-end;
-	}
-	.bar {
-		width: 100%;
-		min-height: 4px;
-		border-radius: 5px 5px 0 0;
-		transition: height 0.3s cubic-bezier(0.2, 0.7, 0.3, 1);
+		gap: 12px;
 	}
 	.lbl {
-		font-size: 10px;
+		font-size: 12px;
 		color: var(--dim);
+		text-align: right;
 		white-space: nowrap;
-		transform: rotate(-40deg);
-		transform-origin: top right;
-		height: 0; /* let rotated text overflow into the reserved padding */
-		align-self: center;
+		overflow: hidden;
+		text-overflow: ellipsis;
 	}
+	.track { display: flex; align-items: center; gap: 8px; }
+	.bar {
+		height: 10px;
+		min-width: 4px;
+		border-radius: 5px;
+		transition: width 0.3s cubic-bezier(0.2, 0.7, 0.3, 1);
+	}
+	.cnt { font-size: 11px; font-weight: 700; color: var(--dim); flex: none; }
 </style>
