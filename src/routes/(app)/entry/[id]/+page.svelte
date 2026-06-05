@@ -20,13 +20,21 @@
 				<polyline points="15 18 9 12 15 6" />
 			</svg>
 		</a>
-		<button class="delete-btn" onclick={() => (confirmDelete = true)}>
-			<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-				<polyline points="3 6 5 6 21 6" />
-				<path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6" />
-				<path d="M10 11v6M14 11v6M9 6V4h6v2" />
-			</svg>
-		</button>
+		<div class="actions">
+			<a href="/entry/{data.entry.id}/edit" class="icon-btn" aria-label="edit entry">
+				<svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+					<path d="M12 20h9" />
+					<path d="M16.5 3.5a2.12 2.12 0 013 3L7 19l-4 1 1-4 12.5-12.5z" />
+				</svg>
+			</a>
+			<button class="icon-btn" onclick={() => (confirmDelete = true)} aria-label="delete entry">
+				<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+					<polyline points="3 6 5 6 21 6" />
+					<path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6" />
+					<path d="M10 11v6M14 11v6M9 6V4h6v2" />
+				</svg>
+			</button>
+		</div>
 	</header>
 
 	<div class="hero">
@@ -72,7 +80,9 @@
 		padding: 16px 20px;
 	}
 
-	.back-btn, .delete-btn {
+	.actions { display: flex; gap: 10px; }
+
+	.back-btn, .icon-btn {
 		display: flex;
 		align-items: center;
 		justify-content: center;
