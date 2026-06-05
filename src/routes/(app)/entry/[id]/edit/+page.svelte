@@ -2,6 +2,7 @@
 	import { enhance } from '$app/forms';
 	import { MOODS, MOOD_CHOICES } from '$lib/diary';
 	import Cropper from '$lib/components/Cropper.svelte';
+	import Toast from '$lib/components/Toast.svelte';
 	import type { PageData, ActionData } from './$types';
 
 	let { data, form }: { data: PageData; form: ActionData } = $props();
@@ -107,12 +108,15 @@
 				{/each}
 			</div>
 
-			{#if form?.error}
-				<p class="error">{form.error}</p>
-			{/if}
 		</div>
 	</form>
 </div>
+
+{#if form?.error}
+	{#key form}
+		<Toast message={form.error} variant="error" />
+	{/key}
+{/if}
 
 {#if cropping && rawSrc}
 	<Cropper src={rawSrc} onconfirm={onCropConfirm} oncancel={closeCropper} />
@@ -266,8 +270,6 @@
 		border-color: color-mix(in oklch, var(--accent) 60%, transparent);
 		background: var(--accent-soft);
 	}
-
-	.error { font-size: 13px; color: #ff6b6b; margin-top: 12px; }
 
 	/* ── desktop ── */
 	@media (min-width: 768px) {

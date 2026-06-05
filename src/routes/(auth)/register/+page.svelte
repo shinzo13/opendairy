@@ -1,7 +1,14 @@
 <script lang="ts">
+	import Toast from '$lib/components/Toast.svelte';
 	import type { ActionData } from './$types';
 	let { form }: { form: ActionData } = $props();
 </script>
+
+{#if form?.error}
+	{#key form}
+		<Toast message={form.error} variant="error" />
+	{/key}
+{/if}
 
 <div class="auth-page">
 	<h1>create account</h1>
@@ -15,9 +22,6 @@
 			<span>password</span>
 			<input type="password" name="password" required autocomplete="new-password" minlength="8" />
 		</label>
-		{#if form?.error}
-			<p class="error">{form.error}</p>
-		{/if}
 		<button type="submit">sign up</button>
 	</form>
 
@@ -72,8 +76,6 @@
 		font-size: 15px;
 		font-weight: 600;
 	}
-
-	.error { font-size: 13px; color: #ff6b6b; }
 
 	.switch { margin-top: 24px; font-size: 14px; color: var(--text-muted); }
 	.switch a { color: var(--accent); }
