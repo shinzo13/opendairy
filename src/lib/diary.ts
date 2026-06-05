@@ -4,30 +4,34 @@
 export type Mood = { label: string; color: string };
 
 export const MOODS: Record<string, Mood> = {
-	calm: { label: 'calm', color: '#a9c08a' },
-	delighted: { label: 'delighted', color: '#f3c24a' },
-	content: { label: 'content', color: '#e6b15a' },
-	cozy: { label: 'cozy', color: '#d98b54' },
-	warm: { label: 'warm', color: '#e9a06c' },
-	restless: { label: 'restless', color: '#8fa2bf' },
-	accomplished: { label: 'accomplished', color: '#bcc16a' },
-	free: { label: 'free', color: '#7cc0ab' },
-	overwhelmed: { label: 'overwhelmed', color: '#cf7f6e' },
-	hopeful: { label: 'hopeful', color: '#f0cd72' },
-	proud: { label: 'proud', color: '#e2a256' },
-	tender: { label: 'tender', color: '#e09a9a' }
+	happy: { label: 'happy', color: '#f3c24a' },
+	excited: { label: 'excited', color: '#f0934a' },
+	calm: { label: 'calm', color: '#7cc0ab' },
+	grateful: { label: 'grateful', color: '#a9c08a' },
+	tender: { label: 'tender', color: '#e09a9a' },
+	melancholy: { label: 'melancholy', color: '#8a7ca8' },
+	sad: { label: 'sad', color: '#6f8bbf' },
+	anxious: { label: 'anxious', color: '#d0a83f' },
+	angry: { label: 'angry', color: '#cf5043' },
+	apathetic: { label: 'apathetic', color: '#8a8f96' },
+	bored: { label: 'bored', color: '#6f7d82' },
+	exhausted: { label: 'exhausted', color: '#9a8f7a' }
 };
 
-// the subset offered when creating an entry (per design handoff)
+// moods offered when creating an entry (full spectrum)
 export const MOOD_CHOICES = [
-	'content',
+	'happy',
+	'excited',
 	'calm',
-	'delighted',
-	'cozy',
-	'warm',
-	'hopeful',
-	'restless',
-	'tender'
+	'grateful',
+	'tender',
+	'melancholy',
+	'sad',
+	'anxious',
+	'angry',
+	'apathetic',
+	'bored',
+	'exhausted'
 ] as const;
 
 export const MONTHS = [
