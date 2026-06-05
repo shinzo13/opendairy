@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { MOODS, MONTHS_SHORT, parseDate, daysBetween, moodCounts, type Entry } from '$lib/diary';
+	import { MONTHS_SHORT, parseDate, daysBetween, type Entry } from '$lib/diary';
 
 	let { entries }: { entries: Entry[] } = $props();
 
@@ -19,7 +19,6 @@
 			return n >= 0 && n <= 7;
 		}).length
 	);
-	const counts = $derived(moodCounts(entries));
 	const firstShort = $derived(MONTHS_SHORT[parseDate(first.date).getMonth()].toLowerCase());
 	const firstDay = $derived(parseDate(first.date).getDate());
 </script>
@@ -40,22 +39,6 @@
 		<div class="stat"><div class="v">{thisMonth}</div><div class="l">this month</div></div>
 		<div class="stat"><div class="v">{thisWeek}</div><div class="l">this week</div></div>
 	</div>
-
-	{#if counts.length > 0}
-		<div class="felt">
-			<h3>how it felt</h3>
-			<div class="moodbar">
-				{#each counts as [m, n] (m)}
-					<span style="flex: {n}; background: {MOODS[m].color}" title={MOODS[m].label}></span>
-				{/each}
-			</div>
-			<div class="moodkey">
-				{#each counts.slice(0, 4) as [m] (m)}
-					<span class="k"><i style="background: {MOODS[m].color}"></i>{MOODS[m].label}</span>
-				{/each}
-			</div>
-		</div>
-	{/if}
 </div>
 
 <style>
@@ -81,11 +64,4 @@
 	.stat { background: var(--card); border-radius: 13px; padding: 12px 13px; }
 	.stat .v { font-size: 21px; font-weight: 700; letter-spacing: -0.02em; }
 	.stat .l { font-size: 11.5px; color: var(--dim); margin-top: 2px; }
-	.felt { margin-top: 18px; }
-	.felt h3 { margin-bottom: 10px; }
-	.moodbar { display: flex; height: 9px; border-radius: 6px; overflow: hidden; gap: 2px; }
-	.moodbar span { display: block; }
-	.moodkey { display: flex; flex-wrap: wrap; gap: 8px 12px; margin-top: 13px; }
-	.moodkey .k { display: flex; align-items: center; gap: 6px; font-size: 11.5px; color: var(--dim); }
-	.moodkey .k i { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
 </style>

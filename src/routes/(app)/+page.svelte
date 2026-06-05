@@ -3,6 +3,7 @@
 	import Toast from '$lib/components/Toast.svelte';
 	import StatsPanel from '$lib/components/StatsPanel.svelte';
 	import MiniCalendar from '$lib/components/MiniCalendar.svelte';
+	import MoodChart from '$lib/components/MoodChart.svelte';
 	import LookingBack from '$lib/components/LookingBack.svelte';
 	import { MOODS, fmtShort, type Entry } from '$lib/diary';
 	import type { PageData } from './$types';
@@ -53,6 +54,7 @@
 				<aside class="side">
 					<div class="cell"><StatsPanel {entries} /></div>
 					<div class="cell"><MiniCalendar {entries} /></div>
+					<div class="cell wide"><MoodChart {entries} /></div>
 					<div class="cell wide"><LookingBack {entries} /></div>
 				</aside>
 
@@ -124,6 +126,7 @@
 					<div class="drawer-body">
 						<StatsPanel {entries} />
 						<MiniCalendar {entries} />
+						<MoodChart {entries} />
 						<LookingBack {entries} />
 					</div>
 				</aside>
@@ -498,6 +501,8 @@
 			-ms-overflow-style: none;
 		}
 		.side::-webkit-scrollbar { width: 0; height: 0; }
+		.cell { display: flex; }
+		.cell :global(.panel) { flex: 1; width: 100%; }
 		.cell.wide { grid-column: 1 / -1; }
 		.timeline-wrap { min-width: 0; padding: 30px 30px 80px; }
 		.timeline { margin: 0 auto; }
