@@ -179,22 +179,11 @@
 	/* ── desktop ── */
 	@media (min-width: 768px) {
 		.page {
-			max-width: 640px;
+			max-width: 560px;
 			margin: 0 auto;
 		}
 
-		.hero {
-			aspect-ratio: auto;
-			background: #000;
-			border-radius: 0 0 var(--radius) var(--radius);
-		}
-
-		.hero img {
-			width: 100%;
-			height: auto;
-			max-height: 70vh;
-			object-fit: contain;
-		}
+		.hero { border-radius: 0 0 var(--radius) var(--radius); }
 
 		article { padding: 32px 24px 64px; }
 

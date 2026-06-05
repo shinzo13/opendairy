@@ -1,20 +1,40 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
 	import { MOODS, MOOD_CHOICES } from '$lib/diary';
+	import Cropper from '$lib/components/Cropper.svelte';
 	import type { ActionData } from './$types';
 
 	let { form }: { form: ActionData } = $props();
 
 	let imagePreview = $state<string | null>(null);
+	let croppedFile = $state<File | null>(null);
+	let rawSrc = $state<string | null>(null);
+	let cropping = $state(false);
 	let saving = $state(false);
 	let mood = $state<string | null>(null);
+	let fileInput: HTMLInputElement;
 
 	function onFileChange(e: Event) {
 		const input = e.target as HTMLInputElement;
 		const file = input.files?.[0];
 		if (!file) return;
+		if (rawSrc) URL.revokeObjectURL(rawSrc);
+		rawSrc = URL.createObjectURL(file);
+		cropping = true;
+		input.value = ''; // allow re-picking the same file
+	}
+
+	function onCropConfirm(file: File) {
+		croppedFile = file;
 		if (imagePreview) URL.revokeObjectURL(imagePreview);
 		imagePreview = URL.createObjectURL(file);
+		closeCropper();
+	}
+
+	function closeCropper() {
+		cropping = false;
+		if (rawSrc) URL.revokeObjectURL(rawSrc);
+		rawSrc = null;
 	}
 </script>
 
@@ -34,7 +54,8 @@
 		id="entry-form"
 		method="POST"
 		enctype="multipart/form-data"
-		use:enhance={() => {
+		use:enhance={({ formData }) => {
+			if (croppedFile) formData.set('image', croppedFile, 'photo.jpg');
 			saving = true;
 			return async ({ update }) => {
 				await update();
@@ -56,7 +77,7 @@
 
 			<label class="photo-btn" class:has-image={!!imagePreview}>
 				{#if imagePreview}
-					<img src={imagePreview} alt="фото" />
+					<img src={imagePreview} alt="" />
 				{:else}
 					<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
 						<rect x="3" y="3" width="18" height="18" rx="2"/>
@@ -65,7 +86,7 @@
 					</svg>
 					<span>add photo</span>
 				{/if}
-				<input type="file" name="image" accept="image/*" onchange={onFileChange} />
+				<input bind:this={fileInput} type="file" accept="image/*" onchange={onFileChange} />
 			</label>
 
 			<textarea
@@ -95,6 +116,10 @@
 		</div>
 	</form>
 </div>
+
+{#if cropping && rawSrc}
+	<Cropper src={rawSrc} onconfirm={onCropConfirm} oncancel={closeCropper} />
+{/if}
 
 <style>
 	.page {
@@ -177,11 +202,12 @@
 
 	.photo-btn.has-image {
 		padding: 0;
-		border-radius: 10px;
+		border-radius: 14px;
 		overflow: hidden;
 		border: none;
 		width: 100%;
-		aspect-ratio: 4/3;
+		max-width: 360px;
+		aspect-ratio: 1 / 1;
 		margin: 12px 0;
 	}
 
@@ -257,17 +283,5 @@
 		.field-date { font-size: 14px; }
 		.field-title { font-size: 24px; }
 		.field-body { font-size: 16px; }
-
-		.photo-btn.has-image {
-			aspect-ratio: auto;
-			max-height: 60vh;
-		}
-
-		.photo-btn.has-image img {
-			height: auto;
-			max-height: 60vh;
-			object-fit: contain;
-			background: #000;
-		}
 	}
 </style>

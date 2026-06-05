@@ -1,11 +1,15 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
 	import { MOODS, MOOD_CHOICES } from '$lib/diary';
+	import Cropper from '$lib/components/Cropper.svelte';
 	import type { PageData, ActionData } from './$types';
 
 	let { data, form }: { data: PageData; form: ActionData } = $props();
 
 	let imagePreview = $state<string | null>(`/api/uploads/${data.entry.imageFilename}`);
+	let croppedFile = $state<File | null>(null);
+	let rawSrc = $state<string | null>(null);
+	let cropping = $state(false);
 	let saving = $state(false);
 	let mood = $state<string | null>(data.entry.mood);
 
@@ -13,8 +17,23 @@
 		const input = e.target as HTMLInputElement;
 		const file = input.files?.[0];
 		if (!file) return;
+		if (rawSrc) URL.revokeObjectURL(rawSrc);
+		rawSrc = URL.createObjectURL(file);
+		cropping = true;
+		input.value = '';
+	}
+
+	function onCropConfirm(file: File) {
+		croppedFile = file;
 		if (imagePreview?.startsWith('blob:')) URL.revokeObjectURL(imagePreview);
 		imagePreview = URL.createObjectURL(file);
+		closeCropper();
+	}
+
+	function closeCropper() {
+		cropping = false;
+		if (rawSrc) URL.revokeObjectURL(rawSrc);
+		rawSrc = null;
 	}
 </script>
 
@@ -34,7 +53,8 @@
 		id="entry-form"
 		method="POST"
 		enctype="multipart/form-data"
-		use:enhance={() => {
+		use:enhance={({ formData }) => {
+			if (croppedFile) formData.set('image', croppedFile, 'photo.jpg');
 			saving = true;
 			return async ({ update }) => {
 				await update();
@@ -66,7 +86,7 @@
 					</svg>
 					<span>add photo</span>
 				{/if}
-				<input type="file" name="image" accept="image/*" onchange={onFileChange} />
+				<input type="file" accept="image/*" onchange={onFileChange} />
 			</label>
 			<span class="photo-hint">tap the photo to replace it</span>
 
@@ -93,6 +113,10 @@
 		</div>
 	</form>
 </div>
+
+{#if cropping && rawSrc}
+	<Cropper src={rawSrc} onconfirm={onCropConfirm} oncancel={closeCropper} />
+{/if}
 
 <style>
 	.page {
@@ -175,11 +199,12 @@
 
 	.photo-btn.has-image {
 		padding: 0;
-		border-radius: 10px;
+		border-radius: 14px;
 		overflow: hidden;
 		border: none;
 		width: 100%;
-		aspect-ratio: 4/3;
+		max-width: 360px;
+		aspect-ratio: 1 / 1;
 		margin: 12px 0 6px;
 	}
 
@@ -257,17 +282,5 @@
 		.field-date { font-size: 14px; }
 		.field-title { font-size: 24px; }
 		.field-body { font-size: 16px; }
-
-		.photo-btn.has-image {
-			aspect-ratio: auto;
-			max-height: 60vh;
-		}
-
-		.photo-btn.has-image img {
-			height: auto;
-			max-height: 60vh;
-			object-fit: contain;
-			background: #000;
-		}
 	}
 </style>
