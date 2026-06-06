@@ -12,7 +12,10 @@ export const GET: RequestHandler = async ({ params }) => {
 		png: 'image/png', webp: 'image/webp', gif: 'image/gif', heic: 'image/heic'
 	};
 
-	return new Response(buf, {
+	// copy into an ArrayBuffer-backed Uint8Array so it satisfies BodyInit
+	const body = new Uint8Array(buf.byteLength);
+	body.set(buf);
+	return new Response(body, {
 		headers: {
 			'Content-Type': mime[ext] ?? 'image/jpeg',
 			'Cache-Control': 'public, max-age=31536000, immutable'
