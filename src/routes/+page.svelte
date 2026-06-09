@@ -3,7 +3,7 @@
 </script>
 
 <svelte:head>
-	<title>opendiary — a photo journal</title>
+	<title>opendiary</title>
 </svelte:head>
 
 <main class="landing">
